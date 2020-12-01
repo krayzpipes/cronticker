@@ -73,7 +73,10 @@ func NewTicker(schedule string) (CronTicker, error) {
 func newTicker(schedule string, c chan time.Time, k <-chan bool) error {
 	var err error
 
-	scheduleWithTZ, tz := guaranteeTimeZone(schedule)
+	scheduleWithTZ, loc, err := guaranteeTimeZone(schedule)
+	if err != nil {
+		return err
+	}
 	parser := getScheduleParser()
 
 	cronSchedule, err := parser.Parse(scheduleWithTZ)
@@ -81,7 +84,7 @@ func newTicker(schedule string, c chan time.Time, k <-chan bool) error {
 		return err
 	}
 
-	go cronRunner(cronSchedule, tz, c, k)
+	go cronRunner(cronSchedule, loc, c, k)
 
 	return nil
 
@@ -96,23 +99,35 @@ func getScheduleParser() cron.Parser {
 
 // guaranteeTimeZone sets the `TZ=` value to `UTC` if there is none
 // already in the cron schedule string.
-func guaranteeTimeZone(schedule string) (string, string) {
-	tz := "UTC"
+func guaranteeTimeZone(schedule string) (string, *time.Location, error) {
+	var loc *time.Location
+
+	// If time zone is not included, set default to UTC
 	if !strings.HasPrefix(schedule, "TZ=") {
-		return fmt.Sprintf("TZ=%v %v", tz, schedule), tz
+		schedule = fmt.Sprintf("TZ=%s %s", "UTC", schedule)
 	}
+
+	tz := extractTZ(schedule)
+
+	loc, err := time.LoadLocation(tz)
+	if err != nil {
+		return schedule, loc, err
+	}
+
+	return schedule, loc, nil
+}
+
+func extractTZ(schedule string) string {
 	end := strings.Index(schedule, " ")
-	eq := strings.Index(schedule, "=")  // TODO - finish this...
-	return schedule, tz
+	eq := strings.Index(schedule, "=")
+	return schedule[eq+1 : end]
 }
 
 // cronRunner handles calculating the next 'tick'. It communicates to
 // the CronTicker via a channel and will stop/return whenever it recieves
 // a bool on the `k` channel.
-func cronRunner(schedule cron.Schedule, tz string, c chan time.Time, k <-chan bool) {
-	// TODO - Should pull location from the schedule and add that to time.now()?
-	// TODO - Otherwise, time.Now() might not be before the next scheduled tick.
-	nextTick := schedule.Next(time.Now())
+func cronRunner(schedule cron.Schedule, loc *time.Location, c chan time.Time, k <-chan bool) {
+	nextTick := schedule.Next(time.Now().In(loc))
 	timer := time.NewTimer(time.Until(nextTick))
 	for {
 		select {
@@ -121,7 +136,7 @@ func cronRunner(schedule cron.Schedule, tz string, c chan time.Time, k <-chan bo
 			return
 		case tickTime := <-timer.C:
 			c <- tickTime
-			nextTick = schedule.Next(tickTime)
+			nextTick = schedule.Next(tickTime.In(loc))
 			timer.Reset(time.Until(nextTick))
 		}
 	}

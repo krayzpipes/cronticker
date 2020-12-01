@@ -20,9 +20,11 @@ func ExampleNewTicker() {
 
 	// Here's a ticker for New York
 	tickerNewYork, _ := NewTicker("TZ=America/New_York 0 0 0 ? * SUN")
+	defer tickerNewYork.Stop()
 
 	// And a ticker for UTC
 	tickerUtc, _ := NewTicker("0 0 0 ? * SUN")
+	defer tickerUtc.Stop()
 
 	for i := 5; i < 5; i++ {
 		select {
@@ -32,6 +34,35 @@ func ExampleNewTicker() {
 			log.Print("It is Sunday in UTC!")
 		}
 	}
-	tickerNewYork.Stop()
-	tickerUtc.Stop()
+}
+
+// If you want to change the cron schedule of a ticker
+// instead of creating a new one you can reset it.
+func ExampleCronTicker_Reset() {
+	ticker, err := NewTicker("TZ=UTC 0 0 0 ? * SUN")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	<-ticker.C
+	log.Print("It's Sunday!")
+
+	err = ticker.Reset("TZ=UTC 0 0 0 ? * WED")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	<-ticker.C
+	log.Print("It's Wednesday!")
+	ticker.Stop()
+}
+
+func ExampleCronTicker_Stop() {
+	ticker, err := NewTicker("TZ=UTC 0 0 0 ? * SUN")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer ticker.Stop()
+
+	<-ticker.C
 }
