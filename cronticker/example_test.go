@@ -2,10 +2,7 @@ package cronticker
 
 import "log"
 
-// In this example, let's pretend you want to know when Sunday
-// begins in New York vs UTC.
 func ExampleNewTicker() {
-
 	// The Cron schedule can be in Unix or Quartz format. Directives like
 	// '@weekly' or '@daily' can also be parsed as defined in the
 	// package github.com/robfig/cron/v3.
@@ -18,6 +15,19 @@ func ExampleNewTicker() {
 	// Example: "TZ=America/Los_Angeles @daily"      -> Directive: Daily at 12 AM in Los Angeles
 	// Example: "@daily"                             -> Directive: Every day at 12 AM UTC
 
+	ticker, err := NewTicker("@daily")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer ticker.Stop()
+
+	tick := <-ticker.C
+	log.Print(tick)
+}
+
+// In this example, let's pretend you want to know when Sunday
+// begins in New York vs UTC.
+func ExampleNewTicker_2() {
 	// Here's a ticker for New York
 	tickerNewYork, _ := NewTicker("TZ=America/New_York 0 0 0 ? * SUN")
 	defer tickerNewYork.Stop()
@@ -43,6 +53,7 @@ func ExampleCronTicker_Reset() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer ticker.Stop()
 
 	<-ticker.C
 	log.Print("It's Sunday!")
@@ -54,7 +65,6 @@ func ExampleCronTicker_Reset() {
 
 	<-ticker.C
 	log.Print("It's Wednesday!")
-	ticker.Stop()
 }
 
 func ExampleCronTicker_Stop() {

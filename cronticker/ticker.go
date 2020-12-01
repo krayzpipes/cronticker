@@ -124,7 +124,7 @@ func extractTZ(schedule string) string {
 }
 
 // cronRunner handles calculating the next 'tick'. It communicates to
-// the CronTicker via a channel and will stop/return whenever it recieves
+// the CronTicker via a channel and will stop/return whenever it receives
 // a bool on the `k` channel.
 func cronRunner(schedule cron.Schedule, loc *time.Location, c chan time.Time, k <-chan bool) {
 	nextTick := schedule.Next(time.Now().In(loc))
