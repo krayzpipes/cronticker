@@ -111,12 +111,12 @@ func TestNewTicker_Error(t *testing.T) {
     }
 }
 
-//func TestnewTicker_ErrorFromGuarantee(t *testing.T) {
-//    _, err := NewTicker("TZ=NOT_VALID @daily")
-//    if err == nil {
-//        log.Fatal("expected error due to TZ parsing, got 'nil'")
-//    }
-//}
+func TestnewTicker_ErrorFromGuarantee(t *testing.T) {
+    _, err := NewTicker("TZ=NOT_VALID @daily")
+    if err == nil {
+        log.Fatal("expected error due to TZ parsing, got 'nil'")
+    }
+}
 
 // Examples for documentation
 
