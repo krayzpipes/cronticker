@@ -86,6 +86,38 @@ Outer:
     }
 }
 
+func TestCronTicker_Reset_Error(t *testing.T) {
+    ticker, _ := NewTicker("@daily")
+    defer ticker.Stop()
+    err := ticker.Reset("NOT_VALID_SCHEDULE")
+    if err == nil {
+        log.Fatal("should have gotten error, but received 'nil'")
+    }
+}
+
+func TestCronTicker_Reset(t *testing.T) {
+    ticker, _ := NewTicker("@daily")
+    defer ticker.Stop()
+    err := ticker.Reset("@monthly")
+    if err != nil {
+        log.Fatalf("expected 'nil', got: %q", err)
+    }
+}
+
+func TestNewTicker_Error(t *testing.T) {
+    _, err := NewTicker("NOT_VALID_SCHEDULE")
+    if err == nil {
+        log.Fatal("expected error, received 'nil'")
+    }
+}
+
+//func TestnewTicker_ErrorFromGuarantee(t *testing.T) {
+//    _, err := NewTicker("TZ=NOT_VALID @daily")
+//    if err == nil {
+//        log.Fatal("expected error due to TZ parsing, got 'nil'")
+//    }
+//}
+
 // Examples for documentation
 
 func ExampleNewTicker() {
