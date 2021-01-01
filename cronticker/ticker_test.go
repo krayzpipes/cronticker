@@ -111,11 +111,34 @@ func TestNewTicker_Error(t *testing.T) {
     }
 }
 
-func TestnewTicker_ErrorFromGuarantee(t *testing.T) {
-    _, err := NewTicker("TZ=NOT_VALID @daily")
+func TestNewTicker_ErrorFromGuarantee(t *testing.T) {
+    c := make(chan time.Time, 1)
+    k := make(chan bool, 1)
+
+    err := newTicker("TZ=BadZone 0 0 0 * * ?", c, k)
     if err == nil {
         log.Fatal("expected error due to TZ parsing, got 'nil'")
     }
+}
+
+func TestCronRunner_MultipleTicks(t *testing.T) {
+    var counter int
+    ticker, _ := NewTicker("*/1 * * * * ?")
+    timeoutTimer := time.NewTimer(5 * time.Second)
+
+Outer:
+    for {
+        select {
+        case <-ticker.C:
+            counter++
+            if counter == 2 {
+                break Outer
+            }
+        case <-timeoutTimer.C:
+            log.Fatalf("timed out before second tick")
+        }
+    }
+
 }
 
 // Examples for documentation
