@@ -3,7 +3,7 @@ Golang ticker that works with Cron scheduling.
 
 [![CircleCI](https://circleci.com/gh/circleci/circleci-docs.svg?style=shield)](https://circleci.com/gh/circleci/circleci-docs)
 ![Codecov](https://img.shields.io/codecov/c/github/krayzpipes/cronticker)
-
+[![Go Report Card](https://goreportcard.com/badge/github.com/krayzpipes/cronticker)](https://goreportcard.com/report/github.com/krayzpipes/cronticker)
 ## Import it
 
 ```bash
