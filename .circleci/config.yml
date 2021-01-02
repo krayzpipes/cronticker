@@ -1,0 +1,20 @@
+version: 2.1
+
+jobs:
+  test:
+    docker:
+      - image: cimg/go:1.15
+    steps:
+      - checkout
+      - run:
+          name: Run Tests
+          command: go test -v -coverprofile=coverage.txt -covermode=atomic ./cronticker/
+      - run:
+          name: Upload Code Coverage
+          command: bash <(curl -s https://codecov.io/bash)
+
+workflows:
+  version: 2.1
+  test:
+    jobs:
+      - test
