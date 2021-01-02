@@ -1,6 +1,7 @@
 # cronticker
 Golang ticker that works with Cron scheduling.
 
+[![CircleCI](https://circleci.com/gh/circleci/circleci-docs.svg?style=shield)](https://circleci.com/gh/circleci/circleci-docs)
 ![Codecov](https://img.shields.io/codecov/c/github/krayzpipes/cronticker)
 
 ## Import it
