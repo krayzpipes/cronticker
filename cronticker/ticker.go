@@ -25,16 +25,16 @@ import (
 	"github.com/robfig/cron/v3"
 )
 
-// CronTicker is the struct/object returned to the user as a proxy
+// CronTicker is the struct returned to the user as a proxy
 // to the ticker. The user can check the ticker channel for the next
-// 'tick' via CronTicker.C (kind of what you can do with 'time.Time.C').
+// 'tick' via CronTicker.C (similar to the user of time.Timer).
 type CronTicker struct {
 	C chan time.Time
 	k chan bool
 }
 
 // Stop sends the appropriate message on the control channel to
-// kill the CronTicker goroutines.
+// kill the CronTicker goroutines. It's good practice to use `defer CronTicker.Stop()`.
 func (c *CronTicker) Stop() {
 	c.k <- true
 }
@@ -51,7 +51,7 @@ func (c *CronTicker) Reset(schedule string) error {
 	return nil
 }
 
-// NewTicker returns a CronTicker object.
+// NewTicker returns a CronTicker struct.
 // You can check the ticker channel for the next tick by
 // `CronTicker.C`
 func NewTicker(schedule string) (CronTicker, error) {
