@@ -1,6 +1,9 @@
 # cronticker
 Golang ticker that works with Cron scheduling.
 
+[![CircleCI](https://circleci.com/gh/circleci/circleci-docs.svg?style=shield)](https://circleci.com/gh/circleci/circleci-docs)
+![Codecov](https://img.shields.io/codecov/c/github/krayzpipes/cronticker)
+
 ## Import it
 
 ```bash
@@ -19,25 +22,24 @@ Create a new ticker:
 ticker, err := NewTicker("TZ=America/New_York 0 0 0 ? * SUN")
 ```
 
-You can listen for messages on the ticker's channel like this:
+Check the ticker's channel for the next tick:
 
 ```go
 tickerTime := <-ticker.C
 ```
 
-You can reset the ticker to a new cron schedule
+Reset the ticker to a new cron schedule
 
 ```go
 err := ticker.Reset("0 0 0 ? * MON,TUE,WED")
 ```
 
-And you can stop it
+Stop the ticker
 ```go
 ticker.Stop()
 ```
 
-To make sure you always clean up the goroutines used by the ticker,
-it's good practice to `defer Stop()` after ticker creation.
+Use `defer ticker.Stop()` whenever you can to ensure the cleanup of goroutines.
 
 ```go
 ticker, _ := NewTicker("@daily")
@@ -45,7 +47,7 @@ defer ticker.Stop()
 ```
 
 ### Cron Schedule Format
-The Cron schedule can be in Unix or Quartz format. Directives like
+The Cron schedule can be in **Unix** or **Quartz** format. Directives like
 '@weekly' or '@daily' can also be parsed as defined in the
 package github.com/robfig/cron/v3.
 
